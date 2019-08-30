@@ -1,45 +1,56 @@
 import express from 'express';
-import { createPost, findAllPosts, findBySlug, removePost, updatePost } from './messages';
+import {
+  createRecord,
+  findAllRecords,
+  findBySlug,
+  removeRecord,
+  updateRecord
+} from './records';
+
 const router = express.Router();
 // GET Methods
 router.get('/', (req, res, next) => {
   res.send(`
 <p>API Endpoints:</p>
 <ul>
-<li><a href="/api/posts">/api/posts</a></li>
-<li><a href="/api/post/1">/api/post/:id</a></li>
+<li><a href="/api/records">/api/records</a></li>
+<li><a href="/api/record/1">/api/record/:id</a></li>
 </ul>
 `);
 });
-router.get('/posts', (req, res, next) => {
-  findAllPosts((posts) => {
+
+router.get('/records', (req, res, next) => {
+  findAllRecords(records => {
     res.json({
-      response: posts
+      response: records
     });
   });
 });
-router.get('/post/:slug', (req, res, next) => {
+
+router.get('/record/:slug', (req, res, next) => {
   const {
     params: { slug }
   } = req;
-  findBySlug(slug, (singlePost) => {
-    console.log('single', singlePost);
-    if (!singlePost || singlePost.length === 0) {
+
+  findBySlug(slug, singleRecord => {
+    console.log('single', singleRecord);
+    if (!singleRecord || singleRecord.length === 0) {
       res.send({
         error: true,
-        message: 'Post not found'
+        message: 'Record not found'
       });
     } else {
       res.json({
-        response: [singlePost]
+        response: [singleRecord]
       });
     }
   });
 });
+
 // POST Methods
-router.post('/post', (req, res, next) => {
-  const { title, content } = req.body;
-  createPost(title, content, (data, error = false) => {
+router.post('/record', (req, res, next) => {
+  const { artist, mix, song, year } = req.body;
+  createRecord(artist, mix, song, year, (data, error = false) => {
     if (error) {
       res.json({
         error: true,
@@ -49,43 +60,47 @@ router.post('/post', (req, res, next) => {
       res.json({
         response: {
           saved: true,
-          post: data
+          record: data
         }
       });
     }
   });
 });
+
 // DELETE Methods
-router.delete('/post/:slug', (req, res, next) => {
+router.delete('/record/:slug', (req, res, next) => {
   const {
     params: { slug }
   } = req;
-  removePost(slug, (removed, error) => {
+  removeRecord(slug, (removed, error) => {
     if (error) {
       res.json({
         error: true,
-        message: 'There was an error trying to remove this post...'
+        message: 'There was an error trying to remove this record...'
       });
     } else {
       res.json({
         response: {
+          data: removed,
           removed: true
         }
       });
     }
   });
 });
+
 // PUT Methods
-router.put('/post/:slug', (req, res, next) => {
+router.put('/record/:slug', (req, res, next) => {
   const {
     params: { slug },
-    body: { title, content }
+    body: { artist, mix, song, year }
   } = req;
-  updatePost(slug, title, content, (affected, error) => {
+  
+  updateRecord(slug, artist, mix, song, year, (affected, error) => {
     if (error) {
       res.json({
         error: true,
-        message: 'There was an error trying to update the post'
+        message: 'There was an error trying to update the record'
       });
     } else {
       res.json({
@@ -97,4 +112,5 @@ router.put('/post/:slug', (req, res, next) => {
     }
   });
 });
+
 export default router;

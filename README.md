@@ -3,8 +3,8 @@
 ```bash
 brew update
 brew install mongodb
-mkdir -p ./data/db
-chomd -R 777 ./data/db
+sudo mkdir -p /data/db
+sudo chmod -R 777 /data/db
 ```
 
 ```bash
